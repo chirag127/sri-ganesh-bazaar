@@ -1,0 +1,73 @@
+---
+import type { Product } from '../lib/types';
+import { getCategories } from '../data/catalog';
+import ProductCard from './ProductCard.astro';
+interface Props { products: Product[]; illustrative: boolean; }
+const { products, illustrative } = Astro.props;
+const categories = getCategories(products);
+---
+<section data-catalog aria-label="Browse the catalog">
+  <form class="catalog-search" id="search" role="search" method="get" data-catalog-search>
+    <div class="catalog-search-inputs">
+      <div>
+        <label for="catalog-query">Find a bag or product</label>
+        <input id="catalog-query" type="search" name="q" placeholder="Try wheat, cattle feed, or 50 kg" maxlength="150" autocomplete="off" />
+      </div>
+      <div>
+        <label for="catalog-category">Category</label>
+        <select id="catalog-category" name="category">
+          <option value="">All categories on this page</option>
+          {categories.map((category) => <option value={category.slug}>{category.name}</option>)}
+        </select>
+      </div>
+    </div>
+    <button class="button" type="submit">Search bags</button>
+    <button class="button quiet" type="reset">Clear</button>
+  </form>
+  <p class="catalog-status" data-catalog-status role="status" aria-live="polite">{products.length} {products.length === 1 ? 'product' : 'products'} · {illustrative ? 'Illustrative catalog, not available to order' : 'Whole bags and packages only'}</p>
+  <noscript><p class="notice">All products are shown below. Search filtering needs JavaScript; category and product links work without it.</p></noscript>
+  <div class="product-grid" data-product-grid>{products.map((product) => <ProductCard product={product} illustrative={illustrative} />)}</div>
+  <div class="catalog-empty" data-catalog-empty hidden={products.length > 0}>
+    <h2>{products.length ? 'No bags match this search' : 'No products are published yet'}</h2>
+    <p>{products.length ? 'Try a product name, a package weight, or a different category. Clear the filters to see every bag on this page.' : 'The catalog is being prepared. No sample stock has been substituted. Check the contact page for the details supplied by the shop.'}</p>
+    <a class="text-link" href="/contact/">Contact & setup information <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((catalog) => {
+    const form = catalog.querySelector<HTMLFormElement>('[data-catalog-search]');
+    const query = catalog.querySelector<HTMLInputElement>('#catalog-query');
+    const category = catalog.querySelector<HTMLSelectElement>('#catalog-category');
+    const status = catalog.querySelector<HTMLElement>('[data-catalog-status]');
+    const empty = catalog.querySelector<HTMLElement>('[data-catalog-empty]');
+    const cards = [...catalog.querySelectorAll<HTMLElement>('[data-product-card]')];
+    if (!form || !query || !category || !status || !empty) return;
+    const params = new URLSearchParams(location.search);
+    query.value = (params.get('q') || '').slice(0, 150);
+    const requestedCategory = params.get('category');
+    if ([...category.options].some((option) => option.value === requestedCategory)) category.value = requestedCategory || '';
+    const filter = () => {
+      const terms = query.value.trim().toLocaleLowerCase('en').split(/\s+/).filter(Boolean);
+      let visible = 0;
+      cards.forEach((card) => {
+        const matches = (!category.value || card.dataset.category === category.value)
+          && terms.every((term) => card.dataset.search?.includes(term));
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      status.textContent = `${visible} of ${cards.length} ${cards.length === 1 ? 'product' : 'products'} shown · whole bags only`;
+      empty.hidden = visible > 0;
+    };
+    form.addEventListener('submit', (event) => {
+      event.preventDefault(); filter();
+      const url = new URL(location.href);
+      if (query.value.trim()) url.searchParams.set('q', query.value.trim()); else url.searchParams.delete('q');
+      if (category.value) url.searchParams.set('category', category.value); else url.searchParams.delete('category');
+      try { history.replaceState(null, '', url); } catch { /* Filtering still works when history is unavailable. */ }
+    });
+    form.addEventListener('reset', () => { query.value = ''; category.value = ''; filter(); });
+    query.addEventListener('input', filter);
+    category.addEventListener('change', filter);
+    filter();
+  });
+</script>

@@ -1,0 +1,5 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminEntry from '../../components/AdminEntry';
+---
+<BaseLayout title="Shop administration" description="Authorized staff workspace." noindex><header class="container app-intro"><h1>Shop administration</h1><p>Server-confirmed staff access is required. Opening this page does not grant permissions.</p></header><section class="container app-shell"><AdminEntry client:only="react"><div slot="fallback" class="island-fallback notice">Loading the staff application. Sign-in and server authorization are required.</div></AdminEntry><noscript><p class="notice">Enable JavaScript to use the authorized staff workspace.</p></noscript></section></BaseLayout>

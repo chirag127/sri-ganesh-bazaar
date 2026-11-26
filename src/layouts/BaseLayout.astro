@@ -1,0 +1,116 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import AnalyticsConsent from '../components/AnalyticsConsent.astro';
+import { getSiteOrigin, getStorefrontCatalog } from '../data/catalog';
+interface Props { title: string; description: string; noindex?: boolean; canonicalPath?: string; }
+const { title, description, noindex = false, canonicalPath } = Astro.props;
+const catalog = await getStorefrontCatalog();
+const illustrative = !catalog.configured;
+const origin = getSiteOrigin(import.meta.env.PUBLIC_SITE_URL);
+const path = canonicalPath || Astro.url.pathname.replace(/index\.html$/, '');
+const canonical = new URL(path, origin).href;
+const privatePage = /^\/(?:app|admin)(?:\/|$)/.test(path);
+const robots = noindex || illustrative || privatePage ? 'noindex, nofollow' : 'index, follow';
+const pageTitle = title === 'Pashu Saathi' ? title : `${title} | Pashu Saathi`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="canonical" href={canonical} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:site_name" content="Pashu Saathi" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <slot name="head" />
+  </head>
+  <body data-catalog-mode={illustrative ? 'illustrative' : 'published'}>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <SiteHeader />
+    {illustrative && <aside class="setup-notice" aria-label="Shop setup notice"><div class="container"><strong>Illustrative catalog · Shop setup is not complete.</strong> Products and pack sizes are examples, not offers or actual stock. Prices are shared privately in quotations. Online ordering is unavailable. <a href="/contact/">Setup &amp; contact details</a></div></aside>}
+    <div class="connection-banner" id="connection-banner" role="status" hidden><p class="container">You are offline. Saved public pages and your bag list may be available. Enquiries, payments and account history need a connection.</p></div>
+    <div class="connection-banner" id="update-banner" hidden><div class="container update-banner"><p>A storefront update is ready. Finish any unsent form before reloading.</p><button id="apply-update" type="button">Reload updated storefront</button></div></div>
+    <main id="main-content" tabindex="-1"><slot /></main>
+    <SiteFooter />
+    {!privatePage && <AnalyticsConsent />}
+    <script>
+      import { Capacitor } from '@capacitor/core';
+      import { CART_EVENT, loadCart } from '../lib/cart';
+      import { staticPageHref } from '../data/catalog';
+
+      const countCart = () => {
+        const total = loadCart().reduce((sum, line) => sum + line.quantity, 0);
+        document.querySelectorAll<HTMLElement>('[data-cart-count]').forEach((count) => {
+          count.textContent = `(${total})`;
+          count.setAttribute('aria-label', `${total} ${total === 1 ? 'package' : 'packages'}`);
+        });
+      };
+      countCart();
+      window.addEventListener(CART_EVENT, countCart);
+      window.addEventListener('storage', countCart);
+      const connection = document.getElementById('connection-banner');
+      const setConnection = () => { if (connection) connection.hidden = navigator.onLine; };
+      setConnection();
+      window.addEventListener('online', setConnection);
+      window.addEventListener('offline', setConnection);
+      document.querySelectorAll<HTMLImageElement>('[data-product-image]').forEach((image) => {
+        const fallback = () => { image.hidden = true; };
+        image.addEventListener('error', fallback, { once: true });
+        if (image.complete && image.naturalWidth === 0) fallback();
+      });
+
+      if (Capacitor.isNativePlatform()) {
+        const rewriteLink = (anchor: HTMLAnchorElement) => {
+          if (!anchor.getAttribute('href') || anchor.getAttribute('href')?.startsWith('#')) return;
+          const url = new URL(anchor.href, location.href);
+          if (url.origin !== location.origin || !['http:', 'https:', 'capacitor:'].includes(url.protocol)) return;
+          anchor.href = staticPageHref(`${url.pathname}${url.search}${url.hash}`);
+        };
+        document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach(rewriteLink);
+        // React islands may add links after startup; the capture phase runs before navigation.
+        document.addEventListener('click', (event) => {
+          const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null;
+          if (anchor) rewriteLink(anchor);
+        }, true);
+        document.querySelectorAll<HTMLFormElement>('form[method="get"]').forEach((form) => {
+          const url = new URL(form.action || location.href);
+          if (url.origin === location.origin) form.action = staticPageHref(url.pathname);
+        });
+      } else if (import.meta.env.PROD && 'serviceWorker' in navigator && window.isSecureContext) {
+        let approvedReload = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (approvedReload) location.reload();
+        });
+        void navigator.serviceWorker.register('/storefront-worker.js', { scope: '/', updateViaCache: 'none' }).then((registration) => {
+          const banner = document.getElementById('update-banner');
+          const button = document.getElementById('apply-update');
+          const showUpdate = () => { if (banner && registration.waiting && navigator.serviceWorker.controller) banner.hidden = false; };
+          button?.addEventListener('click', () => {
+            if (!registration.waiting) return;
+            approvedReload = true;
+            registration.waiting.postMessage({ type: 'ACTIVATE_UPDATE' });
+          });
+          showUpdate();
+          registration.addEventListener('updatefound', () => {
+            registration.installing?.addEventListener('statechange', showUpdate);
+          });
+        }).catch(() => { /* Online shopping remains usable when offline storage is unavailable. */ });
+      }
+    </script>
+  </body>
+</html>

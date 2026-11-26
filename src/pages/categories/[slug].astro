@@ -1,0 +1,20 @@
+---
+import type { Product } from '../../lib/types';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CatalogGrid from '../../components/CatalogGrid.astro';
+import { getStorefrontCatalog, getCategories } from '../../data/catalog';
+export async function getStaticPaths() {
+  const catalog = await getStorefrontCatalog();
+  return getCategories(catalog.products).map((category) => ({ params: { slug: category.slug }, props: { category: category.name, products: catalog.products.filter((product) => product.category === category.name), illustrative: !catalog.configured } }));
+}
+interface Props { category: string; products: Product[]; illustrative: boolean; }
+const { category, products, illustrative } = Astro.props;
+---
+<BaseLayout title={`${category} bags`} description={`Browse ${category.toLowerCase()} bags and package sizes at Pashu Saathi. Whole-package enquiries with prices and availability confirmed by quote.`}>
+  <div class="container">
+    <Breadcrumbs items={[{ label: 'Categories', href: '/categories/' }, { label: category }]} />
+    <header class="page-heading"><p class="eyebrow">Whole bags &amp; large packages</p><h1>{category}</h1><p>{illustrative ? 'Illustrative products and package sizes only. These listings cannot be ordered.' : 'Choose a complete package. Availability and the final amount are confirmed in your quote before acceptance.'}</p><a class="text-link" href="/categories/">← All categories</a></header>
+    <div style="padding-bottom: 4rem"><CatalogGrid products={products} illustrative={illustrative} /></div>
+  </div>
+</BaseLayout>

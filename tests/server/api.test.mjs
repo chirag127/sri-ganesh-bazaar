@@ -1,0 +1,22 @@
+import { describe,it,expect,vi } from 'vitest';
+import {createApi,boundedBody} from '../../server/api.mjs';
+import {createDatabase} from '../../server/database.mjs';
+const id='00000000-0000-4000-8000-000000000001';
+function fixture(){ const rpc=vi.fn(async name=>name==='payment_evidence_access'?true:{ok:true}); const database={catalog:vi.fn(async()=>({products:[]})),withIdentity:vi.fn(async(identity,work)=>work({userId:id,rpc}))}; const storage={put:vi.fn(async()=>{}),url:vi.fn(async()=> 'https://storage.example/signed')};const api=createApi({database,storage,verifyToken:async token=>{if(token!=='valid')throw Error();return {subject:'external',email_verified:true};},origins:['https://shop.example'],uuid:()=>id});return {api,database,storage,rpc}; }
+function req(path,body={},token='valid'){return new Request('https://api.example'+path,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});}
+describe('Neon HTTP boundaries',()=>{
+ it('serves public catalog without identity',async()=>{const f=fixture();expect((await f.api.fetch(new Request('https://api.example/catalog'))).status).toBe(200);expect(f.database.withIdentity).not.toHaveBeenCalled();});
+ it('rejects invalid bearer before database',async()=>{const f=fixture();expect((await f.api.fetch(req('/rpc/customer_workspace',{},'bad'))).status).toBe(401);expect(f.database.withIdentity).not.toHaveBeenCalled();});
+ it('rejects unapproved origins',async()=>{const f=fixture();const r=req('/rpc/customer_workspace');r.headers.set('Origin','https://evil.example');expect((await f.api.fetch(r)).status).toBe(403);});
+ it('only dispatches allowlisted RPCs with exact arguments',async()=>{const f=fixture();expect((await f.api.fetch(req('/rpc/pg_sleep'))).status).toBe(404);expect((await f.api.fetch(req('/rpc/customer_workspace',{subject:'forged'}))).status).toBe(400);expect(f.rpc).not.toHaveBeenCalled();expect((await f.api.fetch(req('/rpc/customer_workspace'))).status).toBe(200);});
+ it('requires durable command IDs',async()=>{const f=fixture();expect((await f.api.fetch(req('/rpc/commerce_command',{p_action:'save_profile',p_payload:{}}))).status).toBe(400);});
+ it('bounds streamed input even without content length',async()=>{await expect(boundedBody(new Request('https://api.example',{method:'POST',body:'123456'}),5)).rejects.toMatchObject({status:413});});
+ it('authorizes order before private object upload and metadata',async()=>{const f=fixture();const r=new Request(`https://api.example/evidence/upload?order_id=${id}`,{method:'POST',headers:{Authorization:'Bearer valid'},body:new Uint8Array([137,80,78,71,13,10,26,10])});expect((await f.api.fetch(r)).status).toBe(200);expect(f.rpc.mock.calls.map(c=>c[0])).toEqual(['customer_order_detail','register_payment_evidence']);expect(f.storage.put).toHaveBeenCalledOnce();});
+ it('denies evidence downloads without database authorization',async()=>{const f=fixture();f.rpc.mockResolvedValue(false);expect((await f.api.fetch(req('/evidence/url',{path:`${id}/${id}/${id}.png`}))).status).toBe(403);expect(f.storage.url).not.toHaveBeenCalled();});
+ it('does not expose SQL errors or credentials',async()=>{const f=fixture();f.rpc.mockRejectedValue(Error('postgres://secret'));const r=await f.api.fetch(req('/rpc/customer_workspace'));expect(await r.text()).not.toContain('secret');});
+ it('unknown phone endpoints cannot report success',async()=>{const f=fixture();expect((await f.api.fetch(req('/phone/start'))).status).toBe(404);});
+});
+describe('request transaction',()=>{
+ it('binds trusted identity and RPC on one connection before commit',async()=>{const query=vi.fn(async sql=>({rows:sql.includes('AS safe')?[{safe:true}]:sql.includes('begin_request')?[{id}]:[{data:{ok:true}}]}));const release=vi.fn();const db=createDatabase({connect:async()=>({query,release})});await db.withIdentity({subject:'s',email:'e',name:'n',email_verified:true},tx=>tx.rpc('customer_workspace'));expect(query.mock.calls.map(c=>c[0])).toEqual(['BEGIN',expect.stringContaining('AS safe'),expect.stringContaining('begin_request'), 'SELECT public.customer_workspace() AS data','COMMIT']);expect(release).toHaveBeenCalledWith(false);});
+ it('rolls back and rejects unsafe owner credentials',async()=>{const query=vi.fn(async()=>({rows:[{safe:false}]}));const release=vi.fn();await expect(createDatabase({connect:async()=>({query,release})}).catalog()).rejects.toThrow('Unsafe');expect(query).toHaveBeenLastCalledWith('ROLLBACK');});
+});

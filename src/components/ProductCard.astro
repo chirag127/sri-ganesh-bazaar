@@ -1,0 +1,24 @@
+---
+import type { Product } from '../lib/types';
+import BagIllustration from './BagIllustration.astro';
+import { categorySlug } from '../data/catalog';
+interface Props { product: Product; illustrative: boolean; }
+const { product, illustrative } = Astro.props;
+const href = `/products/${product.slug}/`;
+---
+<article class="product-card" data-product-card data-category={categorySlug(product.category)} data-search={`${product.name} ${product.category} ${product.description} ${product.variants.map((variant) => variant.label).join(' ')}`.toLowerCase()}>
+  <a class="product-visual" href={href} tabindex="-1" aria-hidden="true">
+    <BagIllustration label={product.name} weight={product.variants[0]?.label || 'WHOLE PACKAGES'} />
+    {product.image_url ? <img src={product.image_url} alt="" width="480" height="384" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-product-image /> : <span class="illustration-note">Generic bag illustration</span>}
+  </a>
+  <div class="product-copy">
+    <p class="category">{product.category}</p>
+    <h3><a href={href}>{product.name}</a></h3>
+    <ul class="package-tags" aria-label="Example package sizes">{product.variants.map((variant) => <li>{variant.label}</li>)}</ul>
+    <p class="product-description">{illustrative ? 'Example listing. Not actual shop stock.' : 'Whole packages only. Final details confirmed in your quote.'}</p>
+    <div class="product-bottom">
+      <p class="product-price">Request a private quotation</p>
+      <a class="text-link" href={href} aria-label={`View ${product.name} packages`}>View bags <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</article>

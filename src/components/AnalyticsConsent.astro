@@ -1,0 +1,27 @@
+---
+---
+<section data-analytics-consent hidden aria-label="Optional analytics" data-clarity-mask="true">
+  <p>Allow optional Google Analytics and Microsoft Clarity on this public catalog page? This helps improve browsing. Account, quote and admin pages are excluded. Permission applies to this page only.</p>
+  <div><button type="button" data-analytics-accept>Allow analytics</button> <button type="button" data-analytics-reject>Keep analytics off</button></div>
+  <p data-analytics-status role="status"></p>
+</section>
+<style>
+  section { margin: 1rem auto; padding: 1rem; max-width: 74rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  p { max-width: 75ch; margin-bottom: .75rem; }
+</style>
+<script>
+  import { Capacitor } from '@capacitor/core';
+  import { getClient, isConfigured } from '../lib/api';
+  import { analyticsConfig, mountPublicAnalytics } from '../lib/public-analytics';
+  mountPublicAnalytics({
+    config: analyticsConfig(import.meta.env), native: Capacitor.isNativePlatform(),
+    anonymous: async () => {
+      if (!isConfigured) return true;
+      const result = await getClient().auth.getSession();
+      return !result.error && !result.data.session;
+    },
+    onSignIn: stop => {
+      if (isConfigured) getClient().auth.onAuthStateChange((_event, session) => { if (session) stop(); });
+    },
+  });
+</script>

@@ -1,0 +1,5 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CustomerEntry from '../../components/CustomerEntry';
+---
+<BaseLayout title="Your account and bag list" description="Manage your bag list, enquiries and account securely." noindex><header class="container app-intro"><h1>Your bag list & account</h1><p>Browse freely. Sign in to send enquiries and view your own orders. Offline changes never confirm an order.</p></header><section class="container app-shell"><CustomerEntry client:only="react"><div slot="fallback" class="island-fallback notice">Loading your application. JavaScript and a connection are required for account actions. <a href="/products/">Browse the public catalog</a></div></CustomerEntry><noscript><p class="notice">Enable JavaScript to access your account. The public catalog remains available.</p></noscript></section></BaseLayout>

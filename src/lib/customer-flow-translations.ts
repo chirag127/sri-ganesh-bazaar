@@ -1,0 +1,162 @@
+import type { Language } from './i18n';
+import { labelStatus } from './format';
+
+/** UI copy only: never pass product labels, customer notes, names or other records. */
+export const customerFlowTranslations = {
+  'Enquire, approve a quote, and keep every order in one place.': 'पूछताछ करें, कोटेशन स्वीकार करें और सभी ऑर्डर एक जगह देखें।',
+  'Google account connected': 'Google खाता जुड़ा हुआ है',
+  'Setup preview — live ordering is not connected.': 'सेटअप पूर्वावलोकन — ऑनलाइन ऑर्डर अभी जुड़ा नहीं है।',
+  'You can explore the public catalog and save a bag list on this device. No account, order, payment, or stock change is simulated.': 'आप सार्वजनिक उत्पाद सूची देख सकते हैं और इस डिवाइस पर खरीद सूची सहेज सकते हैं। कोई खाता, ऑर्डर, भुगतान या स्टॉक बदलाव नकली रूप में नहीं किया जाता।',
+  'You are offline. Saved browsing and cart remain available; orders, quotes, and payments require a confirmed server response.': 'आप ऑफ़लाइन हैं। सहेजी हुई उत्पाद और खरीद सूची उपलब्ध हैं; ऑर्डर, कोटेशन और भुगतान के लिए सर्वर की पुष्टि ज़रूरी है।',
+  'Your account sections': 'आपके खाते के अनुभाग',
+  'Checking your session…': 'आपके सत्र की जाँच हो रही है…',
+  'Your history belongs to you.': 'आपका इतिहास केवल आपके लिए है।',
+  'Sign in with Google to view your orders, receipts, and account balance. Browsing the catalog does not require an account.': 'अपने ऑर्डर, रसीदें और खाते का शेष देखने के लिए Google से साइन इन करें। उत्पाद सूची देखने के लिए खाते की ज़रूरत नहीं है।',
+  'Refreshing your records…': 'आपके रिकॉर्ड ताज़ा हो रहे हैं…',
+  'Everything recorded': 'सभी रिकॉर्ड एक जगह',
+  'No enquiries yet.': 'अभी कोई पूछताछ नहीं है।',
+  'Build your bag list and send your first enquiry. Final prices are always quoted before acceptance.': 'अपनी खरीद सूची बनाएँ और पहली पूछताछ भेजें। स्वीकार करने से पहले अंतिम कीमतें हमेशा कोटेशन में दी जाती हैं।',
+  'Awaiting quotation': 'कोटेशन की प्रतीक्षा है',
+  'View details →': 'विवरण देखें →',
+  '0 orders': '0 ऑर्डर',
+  '{start}–{end} of {total}': 'कुल {total} में से {start}–{end}',
+  'If a connection interrupts a submission, check your history before trying again after a reload. This app never confirms a transaction offline.': 'भेजते समय कनेक्शन टूट जाए तो पेज दोबारा लोड करने के बाद फिर से प्रयास करने से पहले अपना इतिहास देखें। यह ऐप ऑफ़लाइन किसी लेनदेन की पुष्टि नहीं करता।',
+  'Your action completed, but refreshed records could not be loaded. Do not repeat a payment; use Refresh.': 'आपकी कार्रवाई पूरी हुई, लेकिन ताज़ा रिकॉर्ड लोड नहीं हो सके। भुगतान दोबारा न करें; ताज़ा करें बटन का उपयोग करें।',
+  'The action could not be completed.': 'कार्रवाई पूरी नहीं हो सकी।',
+  'Opening Google sign-in': 'Google साइन-इन खुल रहा है',
+  'Signing out': 'साइन आउट हो रहा है',
+  'Sending enquiry': 'पूछताछ भेजी जा रही है',
+  'Enquiry saved. The shop will check the bags and send a quotation before you commit.': 'पूछताछ सहेज ली गई। आपकी सहमति से पहले दुकान पैकेज जाँचकर कोटेशन भेजेगी।',
+  '{count} package choice': '{count} पैकेज विकल्प',
+  '{count} package choices': '{count} पैकेज विकल्प',
+  'Your goods price, transport charge, and any deposit will appear together in your private quotation.': 'सामान की कीमत, परिवहन शुल्क और कोई भी अग्रिम राशि आपके निजी कोटेशन में एक साथ दिखेंगे।',
+  'Showing a saved catalog. Availability and prices must be reconfirmed by the shop.': 'सहेजी हुई उत्पाद सूची दिखाई जा रही है। उपलब्धता और कीमतों की दुकान से दोबारा पुष्टि ज़रूरी है।',
+  'This is a setup preview. Illustrative products cannot be ordered.': 'यह सेटअप पूर्वावलोकन है। उदाहरण के उत्पादों का ऑर्डर नहीं किया जा सकता।',
+  'A good order starts with the right bags.': 'अच्छे ऑर्डर की शुरुआत सही पैकेज से होती है।',
+  'Explore the catalog and add the packages you need. No payment is required to build your list.': 'उत्पाद सूची देखें और ज़रूरी पैकेज जोड़ें। खरीद सूची बनाने के लिए भुगतान की ज़रूरत नहीं है।',
+  'Package no longer in the catalog': 'यह पैकेज अब उत्पाद सूची में नहीं है',
+  'Remove this package before sending an enquiry.': 'पूछताछ भेजने से पहले यह पैकेज हटाएँ।',
+  'Currently unavailable — the shop must reconfirm.': 'अभी उपलब्ध नहीं है — दुकान से दोबारा पुष्टि ज़रूरी है।',
+  'Private cart estimate': 'खरीद सूची का निजी अनुमान',
+  'Approximate totals are available for your approved account. An estimate does not reserve stock; the final quotation still requires your acceptance.': 'आपके स्वीकृत खाते के लिए अनुमानित कुल उपलब्ध है। अनुमान से स्टॉक आरक्षित नहीं होता; अंतिम कोटेशन के लिए आपकी स्वीकृति अभी भी ज़रूरी है।',
+  'Reconnect to request a fresh estimate. Private estimates are not saved offline.': 'नया अनुमान माँगने के लिए फिर से जुड़ें। निजी अनुमान ऑफ़लाइन नहीं सहेजे जाते।',
+  'Estimate unavailable. Your approval or stock may have changed. Refresh your account or send an enquiry for a quotation.': 'अनुमान उपलब्ध नहीं है। आपकी स्वीकृति या स्टॉक बदल सकता है। अपना खाता ताज़ा करें या कोटेशन के लिए पूछताछ भेजें।',
+  'Approximate goods total:': 'सामान का अनुमानित कुल:',
+  'Delivery charges are not configured. The shop will confirm delivery and the final total in your quotation.': 'वितरण शुल्क अभी तय नहीं हैं। दुकान आपके कोटेशन में वितरण और अंतिम कुल की पुष्टि करेगी।',
+  'Delivery estimate: {min} – {max}': 'वितरण का अनुमान: {min} – {max}',
+  'Approximate total:': 'अनुमानित कुल:',
+  'Prices stay private. Shop-approved customers can request approximate totals; all customers receive their prices in a private quotation.': 'कीमतें निजी रहती हैं। दुकान से स्वीकृत ग्राहक अनुमानित कुल माँग सकते हैं; सभी ग्राहकों को कीमतें निजी कोटेशन में मिलती हैं।',
+  'Transport is quoted separately. This is not an accepted order or a sales bill.': 'परिवहन का शुल्क अलग से बताया जाता है। यह स्वीकृत ऑर्डर या बिक्री बिल नहीं है।',
+  'Use your Google account to keep enquiries, quotations, and receipts together.': 'पूछताछ, कोटेशन और रसीदें एक साथ रखने के लिए अपने Google खाते का उपयोग करें।',
+  'Add a contact phone number before sending your first enquiry.': 'पहली पूछताछ भेजने से पहले संपर्क फ़ोन नंबर जोड़ें।',
+  'Collect from the shop': 'दुकान से सामान लें',
+  'Come to the shop after your order is confirmed.': 'ऑर्डर की पुष्टि होने के बाद दुकान पर आएँ।',
+  'Send your own driver': 'अपना चालक भेजें',
+  'You arrange transport; tell the shop who will collect.': 'आप परिवहन की व्यवस्था करें; दुकान को बताएँ कि सामान कौन लेगा।',
+  'Shop-arranged transport': 'दुकान द्वारा परिवहन व्यवस्था',
+  'The shop quotes a tempo or e-rickshaw separately.': 'दुकान टेम्पो या ई-रिक्शा का शुल्क अलग से बताएगी।',
+  'Delivery address and Indian pincode': 'वितरण पता और भारतीय पिनकोड',
+  'Address, landmark, town, and pincode': 'पता, नज़दीकी पहचान, शहर और पिनकोड',
+  'Serviceability is confirmed in your quotation. No courier is booked automatically.': 'आपके स्थान पर वितरण की पुष्टि कोटेशन में होगी। कोई कूरियर अपने आप बुक नहीं होता।',
+  'Custom instructions / विशेष निर्देश': 'विशेष निर्देश',
+  'Optional / वैकल्पिक': 'वैकल्पिक',
+  'Write in Hindi or English — जैसे: गेहूँ का चोकर चाहिए, शाम को सामान लेंगे। / Prefer wheat bran; pickup in the evening.': 'हिन्दी या अंग्रेज़ी में लिखें — जैसे: गेहूँ का चोकर चाहिए, शाम को सामान लेंगे।',
+  'Hindi, English, or Roman Hindi are welcome. Specify product quality, bag size, or collection requirements. Do not include passwords or payment credentials. Instructions are saved with your enquiry for the shop to review; changes require confirmation in your quote.': 'हिन्दी, अंग्रेज़ी या रोमन हिन्दी में लिख सकते हैं। उत्पाद की गुणवत्ता, बोरी का आकार या सामान लेने की ज़रूरतें बताएँ। पासवर्ड या भुगतान की गोपनीय जानकारी न लिखें। दुकान की समीक्षा के लिए निर्देश पूछताछ के साथ सहेजे जाते हैं; बदलावों की कोटेशन में पुष्टि ज़रूरी है।',
+  'I understand this is an enquiry. I will review and approve the final quotation before the order is accepted.': 'मैं समझता/समझती हूँ कि यह पूछताछ है। ऑर्डर स्वीकार होने से पहले मैं अंतिम कोटेशन जाँचकर उसे स्वीकृति दूँगा/दूँगी।',
+  'Your bag list is saved on this device where storage is available. Reconnect to submit; nothing has been sent.': 'जहाँ स्टोरेज उपलब्ध है, आपकी खरीद सूची इस डिवाइस पर सहेजी गई है। भेजने के लिए फिर से जुड़ें; अभी कुछ नहीं भेजा गया है।',
+  'Submitting payment reference': 'भुगतान संदर्भ भेजा जा रहा है',
+  'Enter the amount you actually paid.': 'वही राशि दर्ज करें जिसका आपने वास्तव में भुगतान किया है।',
+  'Reference saved for bank verification. Your balance changes only after the shop confirms receipt.': 'बैंक सत्यापन के लिए संदर्भ सहेजा गया। दुकान द्वारा भुगतान मिलने की पुष्टि के बाद ही आपके खाते का शेष बदलता है।',
+  'Loading current order details…': 'ऑर्डर का वर्तमान विवरण लोड हो रहा है…',
+  'Created {date}': 'बनाया गया: {date}',
+  'Shop pickup': 'दुकान से सामान लेना',
+  'Your driver collects': 'आपका चालक सामान लेगा',
+  'Assigned driver': 'नियुक्त चालक',
+  'Shop': 'दुकान',
+  'Quotation · version {version}': 'कोटेशन · संस्करण {version}',
+  'Valid until {date}': '{date} तक मान्य',
+  'Quoted packages': 'कोटेशन में दिए पैकेज',
+  'If the required deposit is not confirmed by {date}, the reservation may expire.': 'यदि {date} तक आवश्यक अग्रिम की पुष्टि नहीं हुई, तो आरक्षण समाप्त हो सकता है।',
+  'Accepting quotation': 'कोटेशन स्वीकार किया जा रहा है',
+  'Quotation accepted. The shop has recorded your acceptance and reserved available stock.': 'कोटेशन स्वीकार हो गया। दुकान ने आपकी स्वीकृति दर्ज कर ली है और उपलब्ध स्टॉक आरक्षित कर दिया है।',
+  'I approve these package quantities, prices, transport charges, and deposit terms.': 'मैं इन पैकेज की मात्राओं, कीमतों, परिवहन शुल्क और अग्रिम की शर्तों को स्वीकार करता/करती हूँ।',
+  'The server rechecks quote validity and stock before accepting. An expired quote needs reconfirmation by the shop.': 'स्वीकार करने से पहले सर्वर कोटेशन की वैधता और स्टॉक फिर से जाँचता है। समाप्त कोटेशन की दुकान से दोबारा पुष्टि ज़रूरी है।',
+  'The shop is preparing your quotation.': 'दुकान आपका कोटेशन तैयार कर रही है।',
+  'We will not silently substitute products or accept a price on your behalf.': 'हम बिना बताए उत्पाद नहीं बदलेंगे और आपकी ओर से कोई कीमत स्वीकार नहीं करेंगे।',
+  '{count} packages': '{count} पैकेज',
+  'Already paid by UPI? Add your reference': 'UPI से भुगतान कर दिया है? अपना संदर्भ जोड़ें',
+  'Use the payment details supplied by the shop. A screenshot or reference is not proof that payment arrived.': 'दुकान द्वारा दिए गए भुगतान विवरण का उपयोग करें। स्क्रीनशॉट या संदर्भ भुगतान मिलने का प्रमाण नहीं है।',
+  'PNG, JPEG, or WebP; maximum 2 MiB. Stored privately, not in the offline catalog.': 'PNG, JPEG या WebP; अधिकतम 2 MiB। निजी रूप से सहेजा जाता है, ऑफ़लाइन उत्पाद सूची में नहीं।',
+  'Received by assigned driver; remittance tracked separately.': 'नियुक्त चालक ने प्राप्त किया; दुकान को जमा करने का रिकॉर्ड अलग रखा जाता है।',
+  'Received / paid by the shop.': 'दुकान द्वारा प्राप्त / भुगतान किया गया।',
+  'Pashu Saathi': 'पशु साथी',
+  'Sales bill {number}': 'बिक्री बिल {number}',
+  'Issued {date} · Order {number}': 'जारी: {date} · ऑर्डर {number}',
+  'Transport: {amount}': 'परिवहन: {amount}',
+  'Bill total: {amount}': 'बिल का कुल: {amount}',
+  'Sales bill, not a GST tax invoice. Receipts and later adjustments are recorded separately.': 'यह बिक्री बिल है, GST कर चालान नहीं। रसीदें और बाद के समायोजन अलग से दर्ज किए जाते हैं।',
+  'A return adjustment and an actual cash/UPI refund are separate records.': 'वापसी समायोजन और वास्तविक नकद/UPI धनवापसी अलग-अलग रिकॉर्ड हैं।',
+  'Cancel this order? Recorded payments will remain in your history.': 'यह ऑर्डर रद्द करें? दर्ज भुगतान आपके इतिहास में बने रहेंगे।',
+  'Cancelling order': 'ऑर्डर रद्द किया जा रहा है',
+  'Cancellation recorded. Any payment/refund history remains available.': 'रद्द करना दर्ज हो गया। भुगतान/धनवापसी का इतिहास उपलब्ध रहेगा।',
+  'Amount unavailable': 'राशि उपलब्ध नहीं है',
+  'Not set': 'तय नहीं है',
+  'Date unavailable': 'तारीख उपलब्ध नहीं है',
+  'Enter a non-negative rupee amount with at most two decimal places.': 'शून्य या उससे अधिक रुपये की राशि दर्ज करें, अधिकतम दो दशमलव स्थानों के साथ।',
+  'That amount is too large.': 'यह राशि बहुत बड़ी है।',
+  'Enter a whole number of packages greater than zero.': 'शून्य से अधिक पैकेज की पूर्ण संख्या दर्ज करें।',
+  'Enter between 1 and 10,000 packages.': '1 से 10,000 के बीच पैकेज दर्ज करें।',
+  'Enter a whole package quantity between 0 and 10,000.': '0 से 10,000 के बीच पैकेज की पूर्ण संख्या दर्ज करें।',
+  'The shop is not connected yet. Browsing is available; ordering will open after setup.': 'दुकान अभी जुड़ी नहीं है। उत्पाद देख सकते हैं; सेटअप के बाद ऑर्डर शुरू होंगे।',
+  'Sign in with Google before accessing private records.': 'निजी रिकॉर्ड देखने से पहले Google से साइन इन करें।',
+  'Your account changed. Review the form before submitting again.': 'आपका खाता बदल गया है। दोबारा भेजने से पहले फ़ॉर्म जाँचें।',
+  'Sign in with Google before making changes.': 'बदलाव करने से पहले Google से साइन इन करें।',
+  'The public catalog could not be read.': 'सार्वजनिक उत्पाद सूची पढ़ी नहीं जा सकी।',
+  'A catalog product is incomplete.': 'उत्पाद सूची में एक उत्पाद का विवरण अधूरा है।',
+  'A catalog package is incomplete.': 'उत्पाद सूची में एक पैकेज का विवरण अधूरा है।',
+  'Catalog request failed.': 'उत्पाद सूची का अनुरोध विफल रहा।',
+  'The catalog is temporarily unavailable. Please contact the shop.': 'उत्पाद सूची अभी उपलब्ध नहीं है। कृपया दुकान से संपर्क करें।',
+  'Choose a valid order before uploading a screenshot.': 'स्क्रीनशॉट अपलोड करने से पहले मान्य ऑर्डर चुनें।',
+  'Payment screenshots must be between 1 byte and 2 MiB.': 'भुगतान स्क्रीनशॉट का आकार 1 बाइट से 2 MiB के बीच होना चाहिए।',
+  'Payment screenshots must be 2 MiB or smaller.': 'भुगतान स्क्रीनशॉट का आकार 2 MiB या उससे कम होना चाहिए।',
+  'Choose a PNG, JPEG, or WebP screenshot. Other file formats are not accepted.': 'PNG, JPEG या WebP स्क्रीनशॉट चुनें। अन्य फ़ाइल प्रारूप स्वीकार नहीं किए जाते।',
+  'Sign in before uploading a screenshot.': 'स्क्रीनशॉट अपलोड करने से पहले साइन इन करें।',
+  'Screenshot upload failed.': 'स्क्रीनशॉट अपलोड नहीं हो सका।',
+  'Invalid screenshot response.': 'स्क्रीनशॉट का उत्तर अमान्य है।',
+  'The screenshot reference is invalid.': 'स्क्रीनशॉट का संदर्भ अमान्य है।',
+  'Invalid screenshot URL.': 'स्क्रीनशॉट का URL अमान्य है।',
+  'Native Google sign-in is awaiting Neon app-link setup. Use the website to sign in.': 'नेटिव Google साइन-इन के लिए Neon ऐप-लिंक सेटअप बाकी है। साइन इन करने के लिए वेबसाइट का उपयोग करें।',
+  'Google sign-in could not be started. Check the Neon trusted domain configuration.': 'Google साइन-इन शुरू नहीं हो सका। Neon के विश्वसनीय डोमेन का कॉन्फ़िगरेशन जाँचें।',
+  'Sign-out could not be completed. Please retry.': 'साइन आउट पूरा नहीं हो सका। कृपया दोबारा प्रयास करें।',
+  'Connection interrupted. Check order history before retrying; no offline change has been confirmed.': 'कनेक्शन टूट गया। दोबारा प्रयास से पहले ऑर्डर इतिहास देखें; किसी ऑफ़लाइन बदलाव की पुष्टि नहीं हुई है।',
+  'The request could not be completed. Please try again.': 'अनुरोध पूरा नहीं हो सका। कृपया दोबारा प्रयास करें।',
+  'The shop request failed ({status}). Check history before retrying.': 'दुकान का अनुरोध विफल रहा ({status})। दोबारा प्रयास से पहले इतिहास देखें।',
+} as const;
+
+export type CustomerFlowKey = keyof typeof customerFlowTranslations;
+export function customerFlowText(key: CustomerFlowKey, locale: Language, values: Record<string, string | number> = {}): string {
+  const template = locale === 'hi' ? customerFlowTranslations[key] : key;
+  // A single pass preserves interpolation values verbatim, including braces and $ signs.
+  return template.replace(/\{(\w+)\}/g, (placeholder, name: string) => Object.hasOwn(values, name) ? String(values[name]) : placeholder);
+}
+
+/** Render stored action/error copy in the current locale without translating arbitrary records. */
+export function customerFlowFeedback(message: string, locale: Language): string {
+  if (Object.hasOwn(customerFlowTranslations, message)) return customerFlowText(message as CustomerFlowKey, locale);
+  const http = /^The shop request failed \(([1-5]\d{2})\)\. Check history before retrying\.$/.exec(message);
+  if (http) return customerFlowText('The shop request failed ({status}). Check history before retrying.', locale, { status: http[1] });
+  return message;
+}
+
+export const customerFlowStatuses = {
+  enquiry: 'पूछताछ', quoted: 'कोटेशन भेजा गया', accepted: 'स्वीकृत', ready: 'तैयार',
+  dispatched: 'भेजा गया', completed: 'पूरा हुआ', cancelled: 'रद्द',
+  pending: 'लंबित', verified: 'सत्यापित', rejected: 'अस्वीकृत', payment: 'भुगतान', refund: 'धनवापसी',
+} as const;
+export function customerFlowStatus(value: string, locale: Language): string {
+  return locale === 'hi' && Object.hasOwn(customerFlowStatuses, value)
+    ? customerFlowStatuses[value as keyof typeof customerFlowStatuses] : labelStatus(value);
+}
+export function customerPaymentMethod(value: string, locale: Language): string {
+  return locale === 'hi' && value === 'cash' ? 'नकद' : value.toUpperCase();
+}

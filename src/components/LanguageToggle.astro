@@ -1,0 +1,34 @@
+<label class="language-toggle">Language / भाषा
+  <select data-language-toggle aria-label="Language / भाषा">
+    <option value="en" lang="en">English</option>
+    <option value="hi" lang="hi">हिन्दी</option>
+  </select>
+</label>
+<style>
+  .language-toggle { display: grid; gap: .2rem; font-size: .7rem; min-width: 6rem; }
+  select { width: 100%; min-height: 44px; padding: .35rem; }
+</style>
+<script>
+  import { LANGUAGE_EVENT, LANGUAGE_KEY, language, readLanguage, saveLanguage, applyHeaderLanguage } from '../lib/i18n';
+  document.querySelectorAll<HTMLSelectElement>('[data-language-toggle]').forEach(selector => {
+    const header = selector.closest<HTMLElement>('.site-header');
+    if (!header) return;
+    const apply = (value: unknown) => {
+      const locale = language(value);
+      selector.value = locale;
+      applyHeaderLanguage(header, locale);
+      window.dispatchEvent(new CustomEvent(LANGUAGE_EVENT, { detail: { language: locale } }));
+    };
+    let initial = 'en';
+    try { initial = readLanguage(window.localStorage); } catch { /* English without storage. */ }
+    apply(initial);
+    selector.addEventListener('change', () => {
+      const locale = language(selector.value);
+      try { saveLanguage(window.localStorage, locale); } catch { /* Selection works without persistence. */ }
+      apply(locale);
+    });
+    window.addEventListener('storage', event => {
+      if (event.key === LANGUAGE_KEY || event.key === null) apply(event.newValue);
+    });
+  });
+</script>

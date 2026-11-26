@@ -1,0 +1,37 @@
+---
+import LanguageToggle from './LanguageToggle.astro';
+const pathname = Astro.url.pathname.replace(/index\.html$/, '');
+const navigation = [
+  { href: '/products/', label: 'Shop bags', key: 'shop' },
+  { href: '/categories/', label: 'Categories', key: 'categories' },
+  { href: '/#how-it-works', label: 'How to order', key: 'order' },
+  { href: '/contact/', label: 'Contact', key: 'contact' },
+];
+---
+<header class="site-header">
+  <div class="container header-main">
+    <a class="brand" href="/" aria-label="Pashu Saathi home" data-i18n-label="home">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span><span class="brand-name">Pashu Saathi</span><span class="brand-note" data-i18n="note">Cattle feed & wholesale essentials</span></span>
+    </a>
+    <form class="header-search" role="search" action="/products/" method="get" aria-label="Search shop" data-i18n-label="searchShop">
+      <label class="sr-only" for="shop-search" data-i18n="searchLabel">Search feed and wholesale products</label>
+      <input id="shop-search" data-i18n-placeholder="searchHint" type="search" name="q" maxlength="150" placeholder="Search choker, khal, cattle feed…" />
+      <button type="submit" data-i18n="search">Search</button>
+    </form>
+    <div class="header-tools">
+      <a data-i18n="account" class="account-link" href="/app/#account">My account</a>
+      <a class="cart-link" href="/app/#cart">
+        <svg width="18" height="20" viewBox="0 0 20 22" fill="none" aria-hidden="true"><path d="M3 7H17L18 20H2L3 7ZM6 7V5A4 4 0 0 1 14 5V7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
+        <span data-i18n="cart">Bag list</span> <span class="cart-count" data-cart-count aria-label="0 packages">(0)</span>
+      </a>
+    </div>
+  </div>
+  <nav class="header-nav" aria-label="Main navigation" data-i18n-label="navigation">
+    <div class="container header-nav-inner">
+      <ul>{navigation.map(({ href, label, key }) => <li><a data-i18n={key} href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a></li>)}</ul>
+      <LanguageToggle />
+      <span class="header-tagline" data-i18n="tagline">Whole bags. Clear quotes. Personal service.</span>
+    </div>
+  </nav>
+</header>

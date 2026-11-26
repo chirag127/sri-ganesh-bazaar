@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CatalogGrid from '../../components/CatalogGrid.astro';
+import { getStorefrontCatalog } from '../../data/catalog';
+const catalog = await getStorefrontCatalog();
+---
+<BaseLayout title="Bags & packages" description="Browse cattle feed and wholesale packs at Pashu Saathi. Find choker, khal and grains, then request a private quotation." canonicalPath="/products/">
+  <div class="container">
+    <Breadcrumbs items={[{ label: 'All bags & packages' }]} />
+    <header class="page-heading"><p class="eyebrow">The bag list starts here</p><h1>Bags &amp; packages</h1><p>{catalog.configured ? 'Search the published catalog and choose complete packs. Prices stay private; the shop confirms quantities, availability and transport in your quotation.' : 'Explore proposed cattle-feed and wholesale packs. These illustrative names and sizes are not actual shop stock or offers.'}</p></header>
+    <div style="padding-bottom: 4rem"><CatalogGrid products={catalog.products} illustrative={!catalog.configured} /></div>
+  </div>
+</BaseLayout>

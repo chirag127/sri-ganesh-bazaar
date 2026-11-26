@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getStorefrontCatalog, getCategories } from '../../data/catalog';
+const catalog = await getStorefrontCatalog();
+const categories = getCategories(catalog.products);
+---
+<BaseLayout title="Product categories" description="Find cattle feed, grains, jars and household essentials by category. All online enquiries are for whole bags or large packages.">
+  <div class="container">
+    <Breadcrumbs items={[{ label: 'Categories' }]} />
+    <header class="page-heading"><p class="eyebrow">A place for every essential</p><h1>Browse by category</h1><p>{catalog.configured ? 'Find the right shelf, then choose the complete bags or packages you need.' : 'These categories belong to the illustrative catalog. The shop will publish its own actual products after setup.'}</p></header>
+    <div class="category-directory" style="padding-bottom: 4rem">{categories.map((category) => <a href={`/categories/${category.slug}/`}><h2>{category.name} <span aria-hidden="true">↗</span></h2><p>{category.count} {category.count === 1 ? 'product' : 'products'} · {catalog.configured ? 'Whole bags & packages' : 'Illustrative examples'}</p><span class="text-link">Browse {category.name.toLowerCase()}</span></a>)}</div>
+    {categories.length === 0 && <p class="notice" style="margin-bottom: 3rem">No product categories are published yet. <a href="/contact/">Check the shop’s contact details.</a></p>}
+  </div>
+</BaseLayout>

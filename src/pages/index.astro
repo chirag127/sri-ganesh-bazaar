@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { getStorefrontCatalog, getCategories } from '../data/catalog';
+const catalog = await getStorefrontCatalog();
+const categories = getCategories(catalog.products);
+const feed = catalog.products.filter(p => p.category === 'Cattle feed');
+const featured = [...feed, ...catalog.products.filter(p => p.category !== 'Cattle feed')].slice(0, 6);
+const groups = [
+  { name: 'Choker & bran', hindi: 'चोकर', query: 'bran', detail: 'Explore wheat and rice bran', symbol: '◒' },
+  { name: 'Khal & oil cakes', hindi: 'खल', query: 'cake', detail: 'Explore seed cakes and meals', symbol: '▦' },
+  { name: 'Packaged cattle feed', hindi: 'पशु आहार', query: 'cattle feed', detail: 'Compare complete pack options', symbol: '◇' },
+  { name: 'Grains & wholesale bags', hindi: 'अनाज', query: 'grains', detail: 'Wheat, maize and more', symbol: '≋' },
+];
+---
+<BaseLayout title="Pashu Saathi" description="Explore cattle feed, choker, khal and wholesale food bags at Pashu Saathi. Choose fixed packs and request a private quotation." canonicalPath="/">
+  <section class="supply-hero container" aria-labelledby="shop-heading">
+    <div class="supply-intro">
+      <p class="supply-kicker">For dairy owners & livestock keepers</p>
+      <h1 id="shop-heading">Your next feed order starts here.</h1>
+      <p class="supply-lead">Choker, khal and cattle feed, with wholesale grains alongside. Find the right fixed packs for your requirements, then confirm the details with the shop.</p>
+      <div class="actions"><a class="button" href="/products/">Browse bags</a><a class="button secondary" href="/app/#cart">Open my bag list</a></div>
+      <p class="supply-note">Whole bags, jars and fixed packs. Private quotations. No instant checkout.</p>
+    </div>
+    <div class="feed-board">
+      <div class="feed-board-heading"><span lang="hi">पशु साथी</span><p>Find your feed essentials</p></div>
+      <nav class="feed-choices" aria-label="Feed essentials">
+        {groups.map(group => <a href={`/products/?q=${encodeURIComponent(group.query)}`}><span class="feed-symbol" aria-hidden="true">{group.symbol}</span><span><strong>{group.name}</strong><small lang="hi">{group.hindi}</small></span><span aria-hidden="true">↗</span></a>)}
+      </nav>
+      <p class="feed-board-note">Explore the catalog. Availability and product suitability are confirmed by the shop.</p>
+    </div>
+  </section>
+  <div class="order-assurances container"><p><strong>Choose your packs</strong><span>Fixed quantities, clear product details</span></p><p><strong>Tell us what matters</strong><span>Instructions in Hindi or English</span></p><p><strong>Approve your quote</strong><span>Goods and transport confirmed together</span></p></div>
+  <section class="container section" aria-labelledby="browse-heading">
+    <div class="section-heading"><div><h2 id="browse-heading">Feed comes first.</h2><p class="muted">{catalog.configured ? 'Explore published products. Prices are shared privately in your quotation.' : 'A proposed assortment for the shop. These examples are not actual stock and cannot be ordered.'}</p></div><a class="text-link" href="/products/">View all products</a></div>
+    {featured.length ? <div class="product-grid">{featured.map(product => <ProductCard product={product} illustrative={!catalog.configured} />)}</div> : <div class="catalog-empty"><h3>The catalog is being prepared</h3><p>Contact the shop for current product information.</p><a href="/contact/">Contact the shop</a></div>}
+  </section>
+  <section class="category-grid section" aria-labelledby="categories-heading"><div class="container"><div class="section-heading"><div><h2 id="categories-heading">More for your next supply run</h2><p class="muted">Cattle-feed essentials and wholesale food bags, all in one catalog.</p></div><a class="text-link" href="/categories/">All categories</a></div><div class="category-grid-inner">{categories.map(category => <a class="category-card" href={`/categories/${category.slug}/`}><div class="category-copy"><h3>{category.name}</h3><p>{category.count} {category.count === 1 ? 'listing' : 'listings'}</p></div><span aria-hidden="true">↗</span></a>)}</div></div></section>
+  <section class="container section" id="how-it-works" aria-labelledby="process-heading"><div class="section-heading"><div><h2 id="process-heading">A straightforward way to order.</h2><p class="muted">An enquiry starts the conversation. Only an accepted quote confirms your order.</p></div></div><ol class="process-grid"><li><h3>Build your bag list</h3><p>Choose fixed packs and quantities. Sign in with Google and add your contact details when you are ready to enquire.</p></li><li><h3>Review a private quote</h3><p>The shop confirms products, prices, availability, transport and any advance. Quotes are valid for 48 hours.</p></li><li><h3>Arrange collection</h3><p>Accept the quote, then follow the confirmed pickup or transport instructions. UPI payments are verified by the shop.</p></li></ol></section>
+  <section class="collection-band"><div class="container collection-inner"><div><h2>Your goods. Your collection plan.</h2><p>Pick up at the shop, send your own driver, or ask for shop-arranged transport. Coverage and charges are confirmed individually.</p></div><a class="button" href="/contact/">Discuss collection</a></div></section>
+</BaseLayout>

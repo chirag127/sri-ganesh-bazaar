@@ -1,0 +1,84 @@
+---
+import type { Product } from '../../lib/types';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import BagIllustration from '../../components/BagIllustration.astro';
+import { categorySlug, getSiteOrigin, getStorefrontCatalog, jsonForHtml } from '../../data/catalog';
+export async function getStaticPaths() {
+  const catalog = await getStorefrontCatalog();
+  return catalog.products.map((product) => ({ params: { slug: product.slug }, props: { product, illustrative: !catalog.configured } }));
+}
+interface Props { product: Product; illustrative: boolean; }
+const { product, illustrative } = Astro.props;
+const initial = product.variants[0];
+const origin = getSiteOrigin(import.meta.env.PUBLIC_SITE_URL);
+const schema = !illustrative ? {
+  '@context': 'https://schema.org', '@type': 'Product', name: product.name,
+  description: product.description, category: product.category, sku: product.id,
+  url: `${origin}/products/${product.slug}/`,
+  ...(product.image_url ? { image: new URL(product.image_url, origin).href } : {}),
+} : null;
+---
+<BaseLayout title={`${product.name} bags`} description={illustrative ? `Illustrative ${product.name.toLowerCase()} listing. Example package sizes only; not actual stock or an offer.` : `${product.name} at Pashu Saathi. Compare complete package sizes and send an enquiry. Prices and availability are confirmed in your quote.`}>
+  {schema && <script slot="head" type="application/ld+json" set:html={jsonForHtml(schema)} />}
+  <div class="container">
+    <Breadcrumbs items={[{ label: 'Bags & packages', href: '/products/' }, { label: product.category, href: `/categories/${categorySlug(product.category)}/` }, { label: product.name }]} />
+    <section class="detail-grid" aria-labelledby="product-name">
+      <div class="detail-art" aria-label={product.image_url ? `${product.name} product image` : `Generic bag illustration, not a photograph of ${product.name}`}>
+        <BagIllustration label={product.name} weight={initial.label} />
+        {product.image_url ? <img src={product.image_url} alt={product.name} width="600" height="630" decoding="async" referrerpolicy="no-referrer" data-product-image /> : <span class="illustration-note">Generic illustration · not a product photo</span>}
+      </div>
+      <div class="detail-copy">
+        <p class="eyebrow">{product.category} · Whole packages only</p>
+        <h1 id="product-name">{product.name}</h1>
+        <p class="description">{product.description || 'Choose a complete bag or package. Ask the shop to confirm product specifications and suitability before accepting a quote.'}</p>
+        {illustrative && <p class="notice"><strong>Illustrative product.</strong> These package sizes are examples. This item is not actual stock and cannot be added for ordering.</p>}
+        <form class="package-form" data-package-form data-illustrative={String(illustrative)}>
+          <div class="package-fields">
+            <div><label for="package-variant">{illustrative ? 'Example package size' : 'Package size'}</label><select id="package-variant" name="variant_id">{product.variants.map((variant) => <option value={variant.id} data-available={String(variant.available)}>{variant.label}</option>)}</select></div>
+            <div><label for="package-quantity">Number of packages</label><input id="package-quantity" name="quantity" type="number" min="1" max="10000" step="1" value="1" inputmode="numeric" required /></div>
+          </div>
+          <p>Prices and transport are shared in your private quotation.</p>
+          <p class="small muted" data-package-availability>{illustrative ? 'Example only. No live availability.' : initial.available ? 'Available for enquiry at catalog publication. Stock is checked again when you accept a quote.' : 'Availability needs confirmation. Contact the shop before planning collection.'}</p>
+          <div class="actions"><button class="button" type="submit" disabled={illustrative || !initial.available} data-add-package>{illustrative ? 'Example only · ordering unavailable' : initial.available ? 'Add to bag list' : 'Ask the shop for availability'}</button><a class="text-link" href={illustrative ? '/contact/' : '/app/#cart'}>{illustrative ? 'Shop setup details' : 'View your bag list'} <span aria-hidden="true">→</span></a></div>
+          <p class="status-message" data-package-status role="status" aria-live="polite"></p>
+        </form>
+        <noscript><p class="notice">Package comparison is shown above. JavaScript is needed to select packages and save bags. <a href="/contact/">Contact the shop for an enquiry.</a></p></noscript>
+        <div class="detail-notes"><p><strong>Enquiry first.</strong> Adding bags to a list does not place an order, reserve stock or make a payment.</p><p>Google sign-in and a phone contact are required to send an online enquiry. A quote confirms quantities, prices, transport, deposit and collection arrangements.</p><p>The bag list uses this device’s browser storage when available. Offline browsing does not confirm current stock.</p></div>
+      </div>
+    </section>
+    <section class="section" style="border-top: 1px solid var(--border)"><div class="section-heading"><div><h2>Before you accept a quote</h2><p class="muted">Confirm the exact package, product grade and intended use. No loose-quantity sales or silent substitutions.</p></div><a class="text-link" href="/terms/">Read the ordering terms <span aria-hidden="true">→</span></a></div><div class="actions"><a class="button secondary" href="/products/">Back to all bags</a><a class="text-link" href="/contact/">Questions? Contact the shop</a></div></section>
+  </div>
+</BaseLayout>
+<script>
+  import { addToCart } from '../../lib/cart';
+  import { parseQuantity } from '../../lib/format';
+  const form = document.querySelector<HTMLFormElement>('[data-package-form]');
+  if (form) {
+    const variant = form.querySelector<HTMLSelectElement>('#package-variant');
+    const quantity = form.querySelector<HTMLInputElement>('#package-quantity');
+    const availability = form.querySelector<HTMLElement>('[data-package-availability]');
+    const button = form.querySelector<HTMLButtonElement>('[data-add-package]');
+    const status = form.querySelector<HTMLElement>('[data-package-status]');
+    const illustrative = form.dataset.illustrative === 'true';
+    const update = () => {
+      if (!variant || !button || !availability) return;
+      const selected = variant.selectedOptions[0];
+      button.disabled = illustrative || selected.dataset.available !== 'true';
+      button.textContent = illustrative ? 'Example only · ordering unavailable' : button.disabled ? 'Ask the shop for availability' : 'Add to bag list';
+      availability.textContent = illustrative ? 'Example only. No live availability.' : button.disabled ? 'Availability needs confirmation. Contact the shop before planning collection.' : 'Available for enquiry at catalog publication. Stock is checked again when you accept a quote.';
+      if (status) status.textContent = '';
+    };
+    variant?.addEventListener('change', update);
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!variant || !quantity || !status || !button) return;
+      if (illustrative || button.disabled) { status.textContent = 'This package is not available to add. Contact the shop for current details.'; return; }
+      try {
+        const count = parseQuantity(quantity.value);
+        addToCart(variant.value, count);
+        status.textContent = `Added ${count} ${count === 1 ? 'package' : 'packages'} to your bag list. Nothing has been ordered or reserved.`;
+      } catch (error) { status.textContent = error instanceof Error ? error.message : 'The package could not be added. Try again.'; }
+    });
+  }
+</script>
